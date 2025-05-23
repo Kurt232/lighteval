@@ -113,7 +113,8 @@ class VLLMModel(LightevalModel):
         self._max_length = config.max_model_length if config.max_model_length is not None else None
 
         # If model_parallel is not set we compare the number of processes with the number of GPUs
-        self.model = self._create_auto_model(config)
+        self._model = None
+        self._model_initialized = False
 
         # self._device = config.accelerator.device if config.accelerator is not None else "cpu"
         self.multichoice_continuations_start_space = config.multichoice_continuations_start_space
@@ -126,13 +127,20 @@ class VLLMModel(LightevalModel):
         self.pairwise_tokenization = config.pairwise_tokenization
 
     @property
+    def model(self):
+        if not self._model_initialized:
+            self._model = self._create_auto_model(self._config)
+            self._model_initialized = True
+        return self._model
+
+    @property
     def tokenizer(self):
         return self._tokenizer
 
     def cleanup(self):
         destroy_model_parallel()
-        if self.model is not None:
-            del self.model
+        if self._model is not None:
+            del self._model
         gc.collect()
         ray.shutdown()
         destroy_distributed_environment()
