@@ -203,7 +203,9 @@ class LightevalTask:
         ignored = [metric for metric in self.metrics if metric.category == MetricCategory.IGNORED]
 
         if len(ignored) > 0:
-            logger.warning(f"Not implemented yet: ignoring the metric {' ,'.join(ignored)} for task {self.name}.")
+            logger.warning(
+                f"Not implemented yet: ignoring the metric {' ,'.join([str(m) for m in ignored])} for task {self.name}."
+            )
 
         current_categories = [metric.category for metric in self.metrics]
         self.has_metric_category = {category: (category in current_categories) for category in MetricCategory}

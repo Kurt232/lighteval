@@ -461,18 +461,19 @@ class Pipeline:
         # to be able to batch them
         logger.info("--- RUNNING MODEL ---")
         sample_id_to_responses: dict[(SampleUid, MetricCategory), list[ModelResponse]] = collections.defaultdict(list)
+        try:
+            for request_type, requests in self.requests.items():
+                logger.info(f"Running {request_type} requests")
+                run_model = self.model.get_method_from_request_type(request_type=request_type)
+                responses = run_model(requests)
 
-        for request_type, requests in self.requests.items():
-            logger.info(f"Running {request_type} requests")
-            run_model = self.model.get_method_from_request_type(request_type=request_type)
-            responses = run_model(requests)
-
-            # Storing the responses associated to the same samples together
-            for response, request in zip(responses, requests):
-                for metric_category in request.metric_categories:
-                    sample_id = SampleUid(request.task_name, request.sample_index)
-                    sample_id_to_responses[(sample_id, metric_category)].append(response)
-
+                # Storing the responses associated to the same samples together
+                for response, request in zip(responses, requests):
+                    for metric_category in request.metric_categories:
+                        sample_id = SampleUid(request.task_name, request.sample_index)
+                        sample_id_to_responses[(sample_id, metric_category)].append(response)
+        except Exception as e:
+            logger.critical(f"core runtime shutdown: {e}")
         # Cleaning up the model before running metrics
         self.model.cleanup()
 
