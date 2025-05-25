@@ -210,23 +210,26 @@ class EvaluationTracker:
             "summary_general": asdict(self.details_logger.compiled_details_over_all_tasks),
         }
 
-        # Create the details datasets for later upload
-        details_datasets: dict[str, Dataset] = {}
-        for task_name, task_details in self.details_logger.details.items():
-            # Create a dataset from the dictionary - we force cast to str to avoid formatting problems for nested objects
-            dataset = Dataset.from_list([{k: str(v) for k, v in asdict(detail).items()} for detail in task_details])
-
-            # We don't keep 'id' around if it's there
-            column_names = dataset.column_names
-            if "id" in dataset.column_names:
-                column_names = [t for t in dataset.column_names if t != "id"]
-
-            # Sort column names to make it easier later
-            dataset = dataset.select_columns(sorted(column_names))
-            details_datasets[task_name] = dataset
-
         # We save results at every case
         self.save_results(date_id, results_dict)
+
+        if self.should_save_details or self.should_push_to_hub or self.wandb is True:
+            # Create the details datasets for later upload
+            details_datasets: dict[str, Dataset] = {}
+            for task_name, task_details in self.details_logger.details.items():
+                # Create a dataset from the dictionary - we force cast to str to avoid formatting problems for nested objects
+                dataset = Dataset.from_list(
+                    [{k: str(v) for k, v in asdict(detail).items()} for detail in task_details]
+                )
+
+                # We don't keep 'id' around if it's there
+                column_names = dataset.column_names
+                if "id" in dataset.column_names:
+                    column_names = [t for t in dataset.column_names if t != "id"]
+
+                # Sort column names to make it easier later
+                dataset = dataset.select_columns(sorted(column_names))
+                details_datasets[task_name] = dataset
 
         if self.should_save_details:
             self.save_details(date_id, details_datasets)
