@@ -2912,11 +2912,12 @@ def gsm8k_completion(line, task_name: str = None):
 
 def gsm8k_instruct(line, task_name: str = None):
     # Has special analysis in metric for number decomposition
-    instruction = "Question: 1+1=?\nAnswer: #### 2\n\n"
+    instruction = """Solve the following math problem efficiently and clearly.  The last line of your response should be of the following format: 'Therefore, the final answer is: $\\boxed{ANSWER}$. I hope it is correct' (without quotes) where ANSWER is just the final number or expression that solves the problem. Think step by step before answering.\n\n"""
+    query = instruction + f"Question: {line['question']}\n\n"
     return Doc(
         task_name=task_name,
-        query=instruction + f"Question: {line['question']}\nAnswer:",
-        choices=[f" {line['answer']}"],
+        query=query,
+        choices=[line["answer"]],
         gold_index=0,
         instruction=instruction,
     )

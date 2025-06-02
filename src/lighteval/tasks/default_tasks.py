@@ -21926,7 +21926,24 @@ gsm8k_completion = LightevalTaskConfig(
     few_shots_select="random_sampling_from_train",
     generation_size=256,
     metric=[
-        Metrics.expr_gold_metric,
+        Metrics.math_pass_at_1_1n,
+    ],
+    stop_sequence=["Question:"],
+    trust_dataset=True,
+    version=0,
+)
+gsm8k_custom = LightevalTaskConfig(
+    name="gsm8k",
+    suite=["mm"],
+    prompt_function=prompt.gsm8k_instruct,
+    hf_repo="gsm8k",
+    hf_subset="main",
+    hf_avail_splits=["train", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select="random_sampling_from_train",
+    metric=[
+        Metrics.math_pass_at_1_1n,
     ],
     stop_sequence=["Question:"],
     trust_dataset=True,
