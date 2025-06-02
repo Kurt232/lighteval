@@ -26,6 +26,7 @@ using simple function (min, mean, max, ...) at the corpus level. Most metrics fa
 
 import logging
 import os
+import re
 from typing import Callable, Literal, Union
 
 import nltk
@@ -143,6 +144,67 @@ class ExactMatches:
         if self.type_exact_match == "suffix":
             return 1 if pred.endswith(gold) else 0
         return 1 if gold == pred else 0
+
+
+class SimpleEvalMatch:
+    def __init__(
+        self,
+        aggregation_function: Callable[[list[float]], float] = max,
+    ):
+        """Simple Eval from OpenAI and for MCQ.
+
+        currently only for English tasks
+
+        from simple-evals: https://github.com/openai/simple-evals/blob/83ed7640a7d9cd26849bcb3340125002ef14abbe/common.py#L14
+
+        Args:
+            aggregation_function (callable, optional): How to aggregate the item results. Defaults to max.
+                Used if there are several golds or predictions on which scores were computed.
+        """
+        self.aggregation_function = aggregation_function
+
+    def compute(self, golds: list[str], predictions: list[str], **kwargs) -> float:
+        """Computes the metric over a list of golds and predictions for one single sample.
+
+        Args:
+            golds (list[str]): Reference targets
+            predictions (list[str]): Predicted strings
+
+        Returns:
+            float: Aggregated score over the current sample's items.
+        """
+        regex = r"(?i)Answer:\s*([A-Z])"
+        extracted_preds = []
+        for pred in predictions:
+            extracted_answer = None
+            pred = (
+                pred.replace("**", "")
+                .replace("$\\boxed{", "")
+                .replace("}$", "")
+                .replace("\\$", "")
+                .replace("$\\text{", "")
+                .replace("$", "")
+                .replace("\\mathrm{", "")
+                .replace("\\{", "")
+                .replace("\\text", "")
+                .replace("\\(", "")
+                .replace("\\mathbf{", "")
+                .replace("{", "")
+                .replace("\\boxed", "")
+            )
+            match = re.search(regex, pred)
+            if match:
+                extracted_answer = match.group(1).strip()
+            extracted_preds.append(extracted_answer)
+        results = []
+        # We might need to flatten golds if they are a list of lists
+        for gold in golds:
+            for pred in extracted_preds:
+                score = 0
+                if pred:
+                    score = 1 if gold.strip() == pred else 0
+                results.append(score)
+        return self.aggregation_function(results)
 
 
 class F1_score:

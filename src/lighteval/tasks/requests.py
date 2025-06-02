@@ -175,6 +175,7 @@ class Doc:
     original_query: Optional[str] = ""  # the query before preprocessing, if stored
     specific: dict = None  # Information which is specific to the current eval
     task_name: str = ""
+    golds: Union[list[str], None] = None
 
     # For few-shot
     instruction: Optional[str] = ""
@@ -196,6 +197,8 @@ class Doc:
 
     def get_golds(self):
         """Return gold targets extracted from the target dict"""
+        if self.golds is not None:
+            return self.golds
         gold_indices = as_list(self.gold_index)
         golds = []
         for gold_ix in gold_indices:

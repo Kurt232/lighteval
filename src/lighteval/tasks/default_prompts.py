@@ -2774,3 +2774,91 @@ def xsum(line, task_name: str = None):
         choices=[str(line["summary"])],
         specific={"text": line["article"]},
     )
+
+
+# only zero shot
+def mmlu_pro_customized(line, task_name: str = None):
+    """
+    https://huggingface.co/datasets/TIGER-Lab/MMLU-Pro
+    modified by https://github.com/openai/simple-evals/blob/main/common.py#L15
+    """
+    instruction = "Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCDEFGHIJ. Think step by step before answering."
+    query = instruction + "\n\n" + line["question"] + "\n\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["options"])])
+    query += "\n\n"
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+        gold_index=line["answer_index"],
+        specific={"category": line["category"]},
+        instruction=instruction,
+    )
+
+
+def truthful_qa_customized(line, task_name: str = None):
+    choices = LETTER_INDICES[: len(line["choices"])]
+    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {"".join(choices)}. Think step by step before answering."""
+    query = instruction + "\n\n" + line["question"] + "\n\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["options"])])
+    query += "\n\n"
+    return Doc(
+        task_name=task_name, query=query, choices=choices, gold_index=line["gold_index"], instruction=instruction
+    )
+
+
+def commonsense_qa_customized(line, task_name: str = None):
+    """
+    https://huggingface.co/datasets/tau/commonsense_qa
+    """
+    choices = LETTER_INDICES[: len(line["choices"])]
+    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {choices}. Think step by step before answering."""
+    query = instruction + "\n\n" + line["question"] + "\n\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["choices"]["text"])])
+    query += "\n\n"
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=choices,
+        gold_index=LETTER_INDICES.index(line["answerKey"].strip()),
+        golds=[line["answerKey"]],
+        instruction=instruction,
+    )
+
+
+def arc_customized(line, task_name: str = None):
+    choices = LETTER_INDICES[: len(line["choices"])]
+    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {choices}. Think step by step before answering."""
+    query = instruction + "\n\n" + line["question"] + "\n\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["choices"]["text"])])
+    query += "\n\n"
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=choices,
+        gold_index=LETTER_INDICES.index(line["answerKey"].strip()),
+        golds=[line["answerKey"]],
+        instruction=instruction,
+    )
+
+
+def gpqa_customized(line, task_name: str = None):
+    """Prompt template adapted from simple-evals: https://github.com/openai/simple-evals/blob/83ed7640a7d9cd26849bcb3340125002ef14abbe/common.py#L14"""
+    gold_index = random.randint(0, 3)
+    choices = [line["Incorrect Answer 1"], line["Incorrect Answer 2"], line["Incorrect Answer 3"]]
+    choices.insert(gold_index, line["Correct Answer"])
+    instruction = """Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering."""
+    query = instruction + "\n\n" + line["Question"] + "\n\n"
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, choices)])
+    query += "\n\n"
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=["A", "B", "C", "D"],
+        gold_index=gold_index,
+        instruction=instruction,
+    )

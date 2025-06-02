@@ -21706,3 +21706,147 @@ xwinograd_zh_lighteval = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
+
+# customized tasks
+mmlu_pro_customized = LightevalTaskConfig(
+    name="mmlu_pro",
+    suite=["customized"],
+    prompt_function=prompt.mmlu_pro_customized,
+    hf_repo="TIGER-Lab/MMLU-Pro",
+    hf_avail_splits=["validation", "test"],
+    evaluation_splits=["test"],
+    few_shots_split="validation",
+    few_shots_select=None,
+    metric=[Metrics.simple_eval_match],
+    stop_sequence=None,
+    trust_dataset=True,
+    version=0,
+)
+truthfulqa_customized = LightevalTaskConfig(
+    name="truthfulqa",
+    suite=["customized"],
+    prompt_function=prompt.truthful_qa_customized,
+    hf_repo="lighteval/truthfulqa_helm",
+    hf_subset="default",
+    hf_avail_splits=["train", "valid"],
+    evaluation_splits=["valid"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[Metrics.simple_eval_match],
+    stop_sequence=None,
+    trust_dataset=True,
+    version=0,
+)
+commonsenseqa_customized = LightevalTaskConfig(
+    name="commonsenseqa",
+    suite=["customized"],
+    prompt_function=prompt.commonsense_qa_customized,
+    hf_repo="commonsense_qa",
+    hf_subset="default",
+    hf_avail_splits=["train", "test", "validation"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[Metrics.simple_eval_match],
+    stop_sequence=None,
+    trust_dataset=True,
+    version=0,
+)
+arc_easy_customized = LightevalTaskConfig(
+    name="arc:easy",
+    suite=["customized"],
+    prompt_function=prompt.arc_customized,
+    hf_repo="ai2_arc",
+    hf_subset="ARC-Easy",
+    hf_avail_splits=["train", "validation", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[Metrics.simple_eval_match],
+    stop_sequence=None,
+    trust_dataset=True,
+    version=0,
+)
+arc_challenge_customized = LightevalTaskConfig(
+    name="arc:challenge",
+    suite=["customized"],
+    prompt_function=prompt.arc_customized,
+    hf_repo="ai2_arc",
+    hf_subset="ARC-Challenge",
+    hf_avail_splits=["train", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[Metrics.simple_eval_match],
+    stop_sequence=None,
+    trust_dataset=True,
+    version=0,
+)
+gpqa_diamond_instruct_customized = LightevalTaskConfig(
+    name="gpqa:diamond",
+    suite=["customized"],
+    prompt_function=prompt.gpqa_customized,
+    hf_repo="Idavidrein/gpqa",
+    hf_subset="gpqa_diamond",
+    hf_avail_splits=["train"],
+    evaluation_splits=["train"],
+    few_shots_split=None,
+    few_shots_select=None,
+    generation_size=32768,  # needed for reasoning models like R1
+    metric=[
+        Metrics.simple_eval_match,
+    ],
+    stop_sequence=[],  # no stop sequence, will use eos token
+    trust_dataset=True,
+    version=2,
+)
+aime24_customized = LightevalTaskConfig(
+    name="aime24",
+    suite=["customized"],
+    prompt_function=prompt.aime_prompt_fn,
+    hf_repo="HuggingFaceH4/aime_2024",
+    hf_subset="default",
+    hf_avail_splits=["train"],
+    evaluation_splits=["train"],
+    few_shots_split=None,
+    few_shots_select=None,
+    generation_size=32768,
+    metric=[
+        Metrics.math_pass_at_1_1n,
+    ],
+    version=3,
+)
+math_500_customized = LightevalTaskConfig(
+    name="math_500",
+    suite=["customized"],
+    prompt_function=prompt.math_500,
+    hf_repo="HuggingFaceH4/MATH-500",
+    hf_subset="default",
+    hf_avail_splits=["test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select=None,
+    generation_size=32768,
+    metric=[
+        Metrics.math_pass_at_1_1n,
+    ],
+    version=3,
+)
+gsm8k_customized = LightevalTaskConfig(
+    name="gsm8k",
+    suite=["customized"],
+    prompt_function=prompt.gsm8k,
+    hf_repo="gsm8k",
+    hf_subset="main",
+    hf_avail_splits=["train", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select="random_sampling_from_train",
+    metric=[
+        Metrics.quasi_exact_match_gsm8k,
+    ],
+    stop_sequence=["Question:"],
+    trust_dataset=True,
+    version=0,
+)
+# todo:: code benchmark: humaneval & mbpp

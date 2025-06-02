@@ -56,6 +56,7 @@ from lighteval.metrics.metrics_sample import (
     MajAtK,
     PassAtK,
     Recall,
+    SimpleEvalMatch,
     StringDistance,
     acc_golds_likelihood,
 )
@@ -179,6 +180,14 @@ class Metrics(Enum):
     exact_match = SampleLevelMetric(
         metric_name="em",
         sample_level_fn=ExactMatches(strip_strings=True).compute,
+        category=MetricCategory.GENERATIVE,
+        use_case=MetricUseCase.ACCURACY,
+        corpus_level_fn=np.mean,
+        higher_is_better=True,
+    )
+    simple_eval_match = SampleLevelMetric(
+        metric_name="sem",
+        sample_level_fn=SimpleEvalMatch().compute,
         category=MetricCategory.GENERATIVE,
         use_case=MetricUseCase.ACCURACY,
         corpus_level_fn=np.mean,
