@@ -2777,7 +2777,7 @@ def xsum(line, task_name: str = None):
 
 
 # only zero shot
-def mmlu_pro_customized(line, task_name: str = None):
+def mmlu_pro_custom(line, task_name: str = None):
     """
     https://huggingface.co/datasets/TIGER-Lab/MMLU-Pro
     modified by https://github.com/openai/simple-evals/blob/main/common.py#L15
@@ -2797,23 +2797,23 @@ def mmlu_pro_customized(line, task_name: str = None):
     )
 
 
-def truthful_qa_customized(line, task_name: str = None):
+def truthful_qa_custom(line, task_name: str = None):
     choices = LETTER_INDICES[: len(line["choices"])]
     instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {"".join(choices)}. Think step by step before answering."""
     query = instruction + "\n\n" + line["question"] + "\n\n"
-    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["options"])])
+    query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["choices"])])
     query += "\n\n"
     return Doc(
         task_name=task_name, query=query, choices=choices, gold_index=line["gold_index"], instruction=instruction
     )
 
 
-def commonsense_qa_customized(line, task_name: str = None):
+def commonsense_qa_custom(line, task_name: str = None):
     """
     https://huggingface.co/datasets/tau/commonsense_qa
     """
-    choices = LETTER_INDICES[: len(line["choices"])]
-    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {choices}. Think step by step before answering."""
+    choices = LETTER_INDICES[: len(line["choices"]["text"])]
+    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {''.join(choices)}. Think step by step before answering."""
     query = instruction + "\n\n" + line["question"] + "\n\n"
     query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["choices"]["text"])])
     query += "\n\n"
@@ -2823,14 +2823,13 @@ def commonsense_qa_customized(line, task_name: str = None):
         query=query,
         choices=choices,
         gold_index=LETTER_INDICES.index(line["answerKey"].strip()),
-        golds=[line["answerKey"]],
         instruction=instruction,
     )
 
 
-def arc_customized(line, task_name: str = None):
-    choices = LETTER_INDICES[: len(line["choices"])]
-    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {choices}. Think step by step before answering."""
+def arc_custom(line, task_name: str = None):
+    choices = LETTER_INDICES[: len(line["choices"]["text"])]
+    instruction = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {''.join(choices)}. Think step by step before answering."""
     query = instruction + "\n\n" + line["question"] + "\n\n"
     query += "".join([f"{key}. {choice}\n" for key, choice in zip(LETTER_INDICES, line["choices"]["text"])])
     query += "\n\n"
@@ -2839,13 +2838,12 @@ def arc_customized(line, task_name: str = None):
         task_name=task_name,
         query=query,
         choices=choices,
-        gold_index=LETTER_INDICES.index(line["answerKey"].strip()),
-        golds=[line["answerKey"]],
+        gold_index=line["choices"]["label"].index(line["answerKey"]),
         instruction=instruction,
     )
 
 
-def gpqa_customized(line, task_name: str = None):
+def gpqa_custom(line, task_name: str = None):
     """Prompt template adapted from simple-evals: https://github.com/openai/simple-evals/blob/83ed7640a7d9cd26849bcb3340125002ef14abbe/common.py#L14"""
     gold_index = random.randint(0, 3)
     choices = [line["Incorrect Answer 1"], line["Incorrect Answer 2"], line["Incorrect Answer 3"]]
@@ -2860,5 +2858,65 @@ def gpqa_customized(line, task_name: str = None):
         query=query,
         choices=["A", "B", "C", "D"],
         gold_index=gold_index,
+        instruction=instruction,
+    )
+
+
+def gpqa_completion(line, task_name: str = None):
+    gold_index = random.randint(0, 3)
+    choices = [line["Incorrect Answer 1"], line["Incorrect Answer 2"], line["Incorrect Answer 3"]]
+    choices.insert(gold_index, line["Correct Answer"])
+    query = f"Answer the following multiple choice question.\n\nQuestion: {line['Question']}\n"
+    query += "".join([f"\n{key}. {choice}" for key, choice in zip(LETTER_INDICES, choices)])
+    query += "\nAnswer:"
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=["A", "B", "C", "D"],
+        gold_index=gold_index,
+        instruction="Answer the following multiple choice question.\n\n",
+    )
+
+
+def mmlu_pro_completion(line, task_name: str = None):
+    subject = line["category"]
+    query = (
+        f"The following are multiple choice questions (with answers) about {subject}.\n\nQuestion: {line['question']}"
+    )
+    query += "".join([f"\n{key}. {choice}" for key, choice in zip(LETTER_INDICES, line["options"])])
+    query += "\nAnswer:"
+
+    gold_ix = int(line["answer_index"])
+
+    return Doc(
+        task_name=task_name,
+        query=query,
+        choices=LETTER_INDICES[: len(line["options"])],
+        gold_index=gold_ix,
+        fewshot_sorting_class=line["options"][gold_ix],
+        instruction=f"The following are multiple choice questions (with answers) about {subject}.\n\n",
+    )
+
+
+def gsm8k_completion(line, task_name: str = None):
+    # Has special analysis in metric for number decomposition
+    instruction = "Question: 1+1=?\nAnswer: #### 2\n\n"
+    return Doc(
+        task_name=task_name,
+        query=instruction + f"Question: {line['question']}\nAnswer:",
+        choices=[f" {line['answer']}"],
+        gold_index=0,
+        instruction=instruction,
+    )
+
+
+def gsm8k_instruct(line, task_name: str = None):
+    # Has special analysis in metric for number decomposition
+    instruction = "Question: 1+1=?\nAnswer: #### 2\n\n"
+    return Doc(
+        task_name=task_name,
+        query=instruction + f"Question: {line['question']}\nAnswer:",
+        choices=[f" {line['answer']}"],
+        gold_index=0,
         instruction=instruction,
     )

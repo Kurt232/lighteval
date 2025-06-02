@@ -57,6 +57,7 @@ DEFAULT_SUITES = [
     "custom",
     "community",
     "test",
+    "mm",
 ]
 
 TRUNCATE_FEW_SHOTS_DEFAULTS = True

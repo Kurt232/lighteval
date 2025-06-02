@@ -16338,7 +16338,6 @@ truthfulqa_helm = LightevalTaskConfig(
     few_shots_select=None,
     generation_size=5,
     metric=[
-        Metrics.loglikelihood_acc,
         Metrics.exact_match,
         Metrics.quasi_exact_match,
         Metrics.prefix_exact_match,
@@ -21707,12 +21706,95 @@ xwinograd_zh_lighteval = LightevalTaskConfig(
     version=0,
 )
 
-# customized tasks
-mmlu_pro_customized = LightevalTaskConfig(
-    name="mmlu_pro",
-    suite=["customized"],
-    prompt_function=prompt.mmlu_pro_customized,
+mmlu_pro_completion = LightevalTaskConfig(
+    name="mmlu_pro_c",
+    suite=["mm"],
+    prompt_function=prompt.mmlu_pro_completion,
     hf_repo="TIGER-Lab/MMLU-Pro",
+    hf_subset="default",
+    hf_avail_splits=["validation", "test"],
+    evaluation_splits=["test"],
+    few_shots_split="validation",
+    few_shots_select=None,
+    generation_size=5,
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=0,
+)
+gpqa_diamond_completion = LightevalTaskConfig(
+    name="gpqa_c:diamond",
+    suite=["mm"],
+    prompt_function=prompt.gpqa_completion,
+    hf_repo="Idavidrein/gpqa",
+    hf_subset="gpqa_diamond",
+    hf_avail_splits=["train"],
+    evaluation_splits=["train"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=1,
+)
+arc_challenge_completion = LightevalTaskConfig(
+    name="arc_c:challenge",
+    suite=["mm"],
+    prompt_function=prompt.arc_with_options_letters_predict,
+    hf_repo="ai2_arc",
+    hf_subset="ARC-Challenge",
+    hf_avail_splits=["train", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select="random_sampling_from_train",
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=0,
+)
+arc_easy_completion = LightevalTaskConfig(
+    name="arc_c:easy",
+    suite=["mm"],
+    prompt_function=prompt.arc_with_options_letters_predict,
+    hf_repo="ai2_arc",
+    hf_subset="ARC-Easy",
+    hf_avail_splits=["train", "validation", "test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select="random_sampling_from_train",
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=0,
+)
+
+# custom tasks
+mmlu_pro_custom = LightevalTaskConfig(
+    name="mmlu_pro",
+    suite=["mm"],
+    prompt_function=prompt.mmlu_pro_custom,
+    hf_repo="TIGER-Lab/MMLU-Pro",
+    hf_subset="default",
     hf_avail_splits=["validation", "test"],
     evaluation_splits=["test"],
     few_shots_split="validation",
@@ -21722,10 +21804,10 @@ mmlu_pro_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
-truthfulqa_customized = LightevalTaskConfig(
+truthfulqa_custom = LightevalTaskConfig(
     name="truthfulqa",
-    suite=["customized"],
-    prompt_function=prompt.truthful_qa_customized,
+    suite=["mm"],
+    prompt_function=prompt.truthful_qa_custom,
     hf_repo="lighteval/truthfulqa_helm",
     hf_subset="default",
     hf_avail_splits=["train", "valid"],
@@ -21737,14 +21819,14 @@ truthfulqa_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
-commonsenseqa_customized = LightevalTaskConfig(
+commonsenseqa_custom = LightevalTaskConfig(
     name="commonsenseqa",
-    suite=["customized"],
-    prompt_function=prompt.commonsense_qa_customized,
+    suite=["mm"],
+    prompt_function=prompt.commonsense_qa_custom,
     hf_repo="commonsense_qa",
     hf_subset="default",
     hf_avail_splits=["train", "test", "validation"],
-    evaluation_splits=["test"],
+    evaluation_splits=["validation"],
     few_shots_split=None,
     few_shots_select=None,
     metric=[Metrics.simple_eval_match],
@@ -21752,10 +21834,10 @@ commonsenseqa_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
-arc_easy_customized = LightevalTaskConfig(
+arc_easy_custom = LightevalTaskConfig(
     name="arc:easy",
-    suite=["customized"],
-    prompt_function=prompt.arc_customized,
+    suite=["mm"],
+    prompt_function=prompt.arc_custom,
     hf_repo="ai2_arc",
     hf_subset="ARC-Easy",
     hf_avail_splits=["train", "validation", "test"],
@@ -21767,10 +21849,10 @@ arc_easy_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
-arc_challenge_customized = LightevalTaskConfig(
+arc_challenge_custom = LightevalTaskConfig(
     name="arc:challenge",
-    suite=["customized"],
-    prompt_function=prompt.arc_customized,
+    suite=["mm"],
+    prompt_function=prompt.arc_custom,
     hf_repo="ai2_arc",
     hf_subset="ARC-Challenge",
     hf_avail_splits=["train", "test"],
@@ -21782,10 +21864,10 @@ arc_challenge_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
-gpqa_diamond_instruct_customized = LightevalTaskConfig(
+gpqa_diamond_instruct_custom = LightevalTaskConfig(
     name="gpqa:diamond",
-    suite=["customized"],
-    prompt_function=prompt.gpqa_customized,
+    suite=["mm"],
+    prompt_function=prompt.gpqa_custom,
     hf_repo="Idavidrein/gpqa",
     hf_subset="gpqa_diamond",
     hf_avail_splits=["train"],
@@ -21800,9 +21882,9 @@ gpqa_diamond_instruct_customized = LightevalTaskConfig(
     trust_dataset=True,
     version=2,
 )
-aime24_customized = LightevalTaskConfig(
+aime24_custom = LightevalTaskConfig(
     name="aime24",
-    suite=["customized"],
+    suite=["mm"],
     prompt_function=prompt.aime_prompt_fn,
     hf_repo="HuggingFaceH4/aime_2024",
     hf_subset="default",
@@ -21816,9 +21898,9 @@ aime24_customized = LightevalTaskConfig(
     ],
     version=3,
 )
-math_500_customized = LightevalTaskConfig(
+math_500_custom = LightevalTaskConfig(
     name="math_500",
-    suite=["customized"],
+    suite=["mm"],
     prompt_function=prompt.math_500,
     hf_repo="HuggingFaceH4/MATH-500",
     hf_subset="default",
@@ -21832,18 +21914,19 @@ math_500_customized = LightevalTaskConfig(
     ],
     version=3,
 )
-gsm8k_customized = LightevalTaskConfig(
-    name="gsm8k",
-    suite=["customized"],
-    prompt_function=prompt.gsm8k,
+gsm8k_completion = LightevalTaskConfig(
+    name="gsm8k_c",
+    suite=["mm"],
+    prompt_function=prompt.gsm8k_completion,
     hf_repo="gsm8k",
     hf_subset="main",
     hf_avail_splits=["train", "test"],
     evaluation_splits=["test"],
     few_shots_split=None,
     few_shots_select="random_sampling_from_train",
+    generation_size=256,
     metric=[
-        Metrics.quasi_exact_match_gsm8k,
+        Metrics.expr_gold_metric,
     ],
     stop_sequence=["Question:"],
     trust_dataset=True,
