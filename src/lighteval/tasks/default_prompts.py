@@ -2900,10 +2900,10 @@ def mmlu_pro_completion(line, task_name: str = None):
 
 def gsm8k_completion(line, task_name: str = None):
     # Has special analysis in metric for number decomposition
-    instruction = "Question: 1+1=?\nAnswer: #### 2\n\n"
+    instruction = "Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?\nAnswer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute. Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.\n#### 10"
     return Doc(
         task_name=task_name,
-        query=instruction + f"Question: {line['question']}\nAnswer:",
+        query=instruction + f"\n\nQuestion: {line['question']}\nAnswer:",
         choices=[f" {line['answer']}"],
         gold_index=0,
         instruction=instruction,
