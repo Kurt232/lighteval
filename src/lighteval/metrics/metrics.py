@@ -85,6 +85,28 @@ from lighteval.utils.language import Language
 from lighteval.utils.utils import as_list
 
 
+# helper function for parallelizing
+def normalize_math_expression(expression: str) -> str:
+    """Normalize math expressions by extracting key components"""
+    return extract_target_from_pred(
+        expression,
+        get_extraction_regexes(
+            formatted_doc=None,
+            target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
+            language=Language.ENGLISH,
+        ),
+    )
+
+
+def gpqa_sample_scoring_function(pred, ref, doc):
+    return multilingual_extractive_match_metric(
+        language=Language.ENGLISH,
+        gold_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
+        pred_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
+        precision=6,
+    ).sample_level_fn([ref], [pred], doc)
+
+
 class Metrics(Enum):
     acc_golds_likelihood = SampleLevelMetric(  # todo: we need a better name for this!
         metric_name="acc",
@@ -385,24 +407,8 @@ class Metrics(Enum):
             k=1,
             n=1,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -417,24 +423,8 @@ class Metrics(Enum):
             k=1,
             n=4,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -449,24 +439,8 @@ class Metrics(Enum):
             k=1,
             n=8,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -481,24 +455,8 @@ class Metrics(Enum):
             k=1,
             n=16,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -513,24 +471,8 @@ class Metrics(Enum):
             k=1,
             n=32,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -545,24 +487,8 @@ class Metrics(Enum):
             k=1,
             n=64,
             strip_strings=True,
-            # Extracting mathematical expressions and latex expressions
-            normalize_gold=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
-            # Extracting mathematical expressions and latex expressions
-            normalize_pred=lambda k: extract_target_from_pred(
-                k,
-                get_extraction_regexes(
-                    formatted_doc=None,
-                    target_types=[ExprExtractionConfig(), LatexExtractionConfig()],
-                    language=Language.ENGLISH,
-                ),
-            ),
+            normalize_gold=normalize_math_expression,
+            normalize_pred=normalize_math_expression,
             # Uses sympy for comparison
             sample_scoring_function=compare_gold_target,
         ).compute,
@@ -884,12 +810,7 @@ class Metrics(Enum):
         sample_level_fn=PassAtK(
             k=1,
             n=1,
-            sample_scoring_function=lambda pred, ref, doc: multilingual_extractive_match_metric(
-                language=Language.ENGLISH,
-                gold_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                pred_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                precision=6,
-            ).sample_level_fn([ref], [pred], doc),
+            sample_scoring_function=gpqa_sample_scoring_function,
         ).compute,
         category=MetricCategory.GENERATIVE_SAMPLING,
         use_case=MetricUseCase.REASONING,
@@ -901,12 +822,7 @@ class Metrics(Enum):
         sample_level_fn=PassAtK(
             k=1,
             n=4,
-            sample_scoring_function=lambda pred, ref, doc: multilingual_extractive_match_metric(
-                language=Language.ENGLISH,
-                gold_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                pred_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                precision=6,
-            ).sample_level_fn([ref], [pred], doc),
+            sample_scoring_function=gpqa_sample_scoring_function,
         ).compute,
         category=MetricCategory.GENERATIVE_SAMPLING,
         use_case=MetricUseCase.REASONING,
@@ -918,12 +834,7 @@ class Metrics(Enum):
         sample_level_fn=PassAtK(
             k=1,
             n=8,
-            sample_scoring_function=lambda pred, ref, doc: multilingual_extractive_match_metric(
-                language=Language.ENGLISH,
-                gold_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                pred_extraction_target=[IndicesExtractionConfig(prefix_for_extraction="NativeLetters")],
-                precision=6,
-            ).sample_level_fn([ref], [pred], doc),
+            sample_scoring_function=gpqa_sample_scoring_function,
         ).compute,
         category=MetricCategory.GENERATIVE_SAMPLING,
         use_case=MetricUseCase.REASONING,
