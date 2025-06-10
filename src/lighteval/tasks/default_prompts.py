@@ -2844,7 +2844,25 @@ def arc_custom(line, task_name: str = None):
 
 
 def gpqa_custom(line, task_name: str = None):
-    """Prompt template adapted from simple-evals: https://github.com/openai/simple-evals/blob/83ed7640a7d9cd26849bcb3340125002ef14abbe/common.py#L14"""
+    """Prompt template adapted from simple-evals: https://github.com/openai/simple-evals/blob/83ed7640a7d9cd26849bcb3340125002ef14abbe/common.py#L14
+
+    Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD. Think step by step before answering.
+
+    acetic acid is treated with bromine, pyridine, and acetic anhydride with heating, forming product 1.
+
+    1 is heated with ethanol and a small amount of sulfuric acid, forming product 2.
+
+    2 is treated with sodium cyanide, forming product 3.
+
+    3 is then treated with excess sodium hydride and 1,5-dibromopentane, forming final product 4.
+
+    how many distinct hydrogen signals will be observable in the 1H NMR spectrum of 4? (some of them maybe very close in chemical shift and thus not practically distinguishable, but the desired answer is the number of chemically distinct hydrogens)
+
+    A. 5
+    B. 8
+    C. 10
+    D. 12
+    """
     gold_index = random.randint(0, 3)
     choices = [line["Incorrect Answer 1"], line["Incorrect Answer 2"], line["Incorrect Answer 3"]]
     choices.insert(gold_index, line["Correct Answer"])
@@ -2863,6 +2881,25 @@ def gpqa_custom(line, task_name: str = None):
 
 
 def gpqa_completion(line, task_name: str = None):
+    """
+    Answer the following multiple choice question.
+
+    Question: acetic acid is treated with bromine, pyridine, and acetic anhydride with heating, forming product 1.
+
+    1 is heated with ethanol and a small amount of sulfuric acid, forming product 2.
+
+    2 is treated with sodium cyanide, forming product 3.
+
+    3 is then treated with excess sodium hydride and 1,5-dibromopentane, forming final product 4.
+
+    how many distinct hydrogen signals will be observable in the 1H NMR spectrum of 4? (some of them maybe very close in chemical shift and thus not practically distinguishable, but the desired answer is the number of chemically distinct hydrogens)
+
+    A. 5
+    B. 8
+    C. 10
+    D. 12
+    Answer:
+    """
     gold_index = random.randint(0, 3)
     choices = [line["Incorrect Answer 1"], line["Incorrect Answer 2"], line["Incorrect Answer 3"]]
     choices.insert(gold_index, line["Correct Answer"])
@@ -2874,7 +2911,7 @@ def gpqa_completion(line, task_name: str = None):
         query=query,
         choices=["A", "B", "C", "D"],
         gold_index=gold_index,
-        instruction="Answer the following multiple choice question.\n\n",
+        instruction="Answer the following multiple choice question.",
     )
 
 
@@ -2894,7 +2931,7 @@ def mmlu_pro_completion(line, task_name: str = None):
         choices=LETTER_INDICES[: len(line["options"])],
         gold_index=gold_ix,
         fewshot_sorting_class=line["options"][gold_ix],
-        instruction=f"The following are multiple choice questions (with answers) about {subject}.\n\n",
+        instruction=f"The following are multiple choice questions (with answers) about {subject}.",
     )
 
 
@@ -2918,6 +2955,34 @@ def gsm8k_instruct(line, task_name: str = None):
         task_name=task_name,
         query=query,
         choices=[line["answer"]],
+        gold_index=0,
+        instruction=instruction,
+    )
+
+
+def math_500_completion(line, task_name: str = None):
+    """
+    zero-shot only
+    """
+    instruction = "Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?\nAnswer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute. Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.\n#### 10"
+    return Doc(
+        task_name=task_name,
+        query=instruction + f"\n\nQuestion: {line['problem']}\nAnswer:",
+        choices=[f" {line['solution']}"],
+        gold_index=0,
+        instruction=instruction,
+    )
+
+
+def aime_completion(line, task_name: str = None):
+    """
+    zero-shot only
+    """
+    instruction = "Question: Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?\nAnswer: Weng earns 12/60 = $<<12/60=0.2>>0.2 per minute. Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.\n#### 10"
+    return Doc(
+        task_name=task_name,
+        query=instruction + f"\n\nQuestion: {line['problem']}\nAnswer:",
+        choices=[f" {line['answer']}"],
         gold_index=0,
         instruction=instruction,
     )

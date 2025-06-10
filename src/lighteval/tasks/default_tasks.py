@@ -21728,7 +21728,7 @@ mmlu_pro_completion = LightevalTaskConfig(
     version=0,
 )
 gpqa_diamond_completion = LightevalTaskConfig(
-    name="gpqa_c:diamond",
+    name="gpqa_diamond_c",
     suite=["mm"],
     prompt_function=prompt.gpqa_completion,
     hf_repo="Idavidrein/gpqa",
@@ -21748,7 +21748,7 @@ gpqa_diamond_completion = LightevalTaskConfig(
     version=1,
 )
 arc_challenge_completion = LightevalTaskConfig(
-    name="arc_c:challenge",
+    name="arc_challenge_c",
     suite=["mm"],
     prompt_function=prompt.arc_with_options_letters_predict,
     hf_repo="ai2_arc",
@@ -21768,7 +21768,7 @@ arc_challenge_completion = LightevalTaskConfig(
     version=0,
 )
 arc_easy_completion = LightevalTaskConfig(
-    name="arc_c:easy",
+    name="arc_easy_c",
     suite=["mm"],
     prompt_function=prompt.arc_with_options_letters_predict,
     hf_repo="ai2_arc",
@@ -21819,6 +21819,27 @@ truthfulqa_custom = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
+truthfulqa_completion = LightevalTaskConfig(
+    name="truthfulqa_c",
+    suite=["mm"],
+    prompt_function=prompt.truthful_qa_helm,
+    hf_repo="lighteval/truthfulqa_helm",
+    hf_subset="default",
+    hf_avail_splits=["train", "valid"],
+    evaluation_splits=["valid"],
+    few_shots_split=None,
+    few_shots_select=None,
+    generation_size=5,
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=0,
+)
 commonsenseqa_custom = LightevalTaskConfig(
     name="commonsenseqa",
     suite=["mm"],
@@ -21834,8 +21855,29 @@ commonsenseqa_custom = LightevalTaskConfig(
     trust_dataset=True,
     version=0,
 )
+commonsenseqa_completion = LightevalTaskConfig(
+    name="commonsenseqa_c",
+    suite=["mm"],
+    prompt_function=prompt.commonsense_qa,
+    hf_repo="commonsense_qa",
+    hf_subset="default",
+    hf_avail_splits=["train", "test", "validation"],
+    evaluation_splits=["validation"],
+    few_shots_split=None,
+    few_shots_select=None,
+    generation_size=1,
+    metric=[
+        Metrics.exact_match,
+        Metrics.quasi_exact_match,
+        Metrics.prefix_exact_match,
+        Metrics.prefix_quasi_exact_match,
+    ],
+    stop_sequence=["\n"],
+    trust_dataset=True,
+    version=0,
+)
 arc_easy_custom = LightevalTaskConfig(
-    name="arc:easy",
+    name="arc_easy",
     suite=["mm"],
     prompt_function=prompt.arc_custom,
     hf_repo="ai2_arc",
@@ -21850,7 +21892,7 @@ arc_easy_custom = LightevalTaskConfig(
     version=0,
 )
 arc_challenge_custom = LightevalTaskConfig(
-    name="arc:challenge",
+    name="arc_challenge",
     suite=["mm"],
     prompt_function=prompt.arc_custom,
     hf_repo="ai2_arc",
@@ -21865,7 +21907,7 @@ arc_challenge_custom = LightevalTaskConfig(
     version=0,
 )
 gpqa_diamond_instruct_custom = LightevalTaskConfig(
-    name="gpqa:diamond",
+    name="gpqa_diamond",
     suite=["mm"],
     prompt_function=prompt.gpqa_custom,
     hf_repo="Idavidrein/gpqa",
@@ -21928,7 +21970,7 @@ gsm8k_completion = LightevalTaskConfig(
     metric=[
         Metrics.math_pass_at_1_1n,
     ],
-    stop_sequence=["Question:"],
+    stop_sequence=["Question"],
     trust_dataset=True,
     version=0,
 )
@@ -21945,8 +21987,39 @@ gsm8k_custom = LightevalTaskConfig(
     metric=[
         Metrics.math_pass_at_1_1n,
     ],
-    stop_sequence=["Question:"],
     trust_dataset=True,
     version=0,
+)
+aime24_completion = LightevalTaskConfig(
+    name="aime24_c",
+    suite=["mm"],
+    prompt_function=prompt.aime_completion,
+    hf_repo="HuggingFaceH4/aime_2024",
+    hf_subset="default",
+    hf_avail_splits=["train"],
+    evaluation_splits=["train"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[
+        Metrics.math_pass_at_1_1n,
+    ],
+    stop_sequence=["Question"],
+    version=3,
+)
+math_500_completion = LightevalTaskConfig(
+    name="math_500_c",
+    suite=["mm"],
+    prompt_function=prompt.math_500_completion,
+    hf_repo="HuggingFaceH4/MATH-500",
+    hf_subset="default",
+    hf_avail_splits=["test"],
+    evaluation_splits=["test"],
+    few_shots_split=None,
+    few_shots_select=None,
+    metric=[
+        Metrics.math_pass_at_1_1n,
+    ],
+    stop_sequence=["Question"],
+    version=3,
 )
 # todo:: code benchmark: humaneval & mbpp
